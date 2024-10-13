@@ -1,6 +1,7 @@
 package br.com.clickbus.challenge.contoller;
 
 
+import br.com.clickbus.challenge.config.ModelMapperConfig;
 import br.com.clickbus.challenge.controller.PlaceController;
 import br.com.clickbus.challenge.dto.PlaceDTO;
 import br.com.clickbus.challenge.entity.Place;
@@ -12,6 +13,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
@@ -38,6 +40,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(PlaceController.class)
+@Import(ModelMapperConfig.class)
 public class PlaceControllerTest {
 
     @Autowired
@@ -79,6 +82,7 @@ public class PlaceControllerTest {
 
     @Test
     public void whenFindByIdThenReturnOk() throws Exception {
+
         when(service.findById(1L)).thenReturn(Optional.of(place));
 
         mockMvc.perform(get("/places/{id}", 1L)
@@ -109,13 +113,14 @@ public class PlaceControllerTest {
 
     @Test
     public void whenFindByNameThenReturnOk() throws Exception {
+       
         when(service.findByName("Butanta")).thenReturn(Arrays.asList(place));
 
-        mockMvc.perform(get("/places/?name={name}", "Butanta")
+        mockMvc.perform(get("/places/name/{name}", "Butanta")
                 .accept(MediaType.APPLICATION_JSON))
                .andExpect(status().isOk())
                .andDo(print())
-               .andExpect(jsonPath("$", hasSize(1)))
+                .andExpect(jsonPath("$", hasSize(1)))
                .andExpect(jsonPath("$[0].name", is("Butanta")))
                .andExpect(jsonPath("$[0].slug", is("bt")))
                .andExpect(jsonPath("$[0].city", is("Sao Paulo")))
@@ -128,21 +133,23 @@ public class PlaceControllerTest {
 
     @Test
     public void whenFindByNameThenReturnNotFound() throws Exception {
-
+        // Configurando o mock para retornar uma lista vazia
         when(service.findByName("Cotia")).thenReturn(Collections.emptyList());
 
-        mockMvc.perform(get("/places/?name={name}", "Cotia")
+        // Executando a requisição
+        mockMvc.perform(get("/places/name/{name}", "Cotia")
                 .accept(MediaType.APPLICATION_JSON))
                .andExpect(status().isNotFound())
                .andDo(print())
                .andReturn().getResponse();
 
-
-        verify(service, atLeastOnce()).findByName(anyString());
+        // Verificando se o método foi chamado
+        verify(service, atLeastOnce()).findByName("Cotia");
     }
 
     @Test
     public void whenSaveThenReturnCreated() throws Exception {
+        
         when(service.save(any(Place.class))).thenReturn(place);
 
         System.out.println(objectMapper.writeValueAsString(place));

@@ -3,7 +3,7 @@ package br.com.clickbus.challenge.entity;
 
 import br.com.clickbus.challenge.dto.PlaceDTO;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.Entity;
@@ -14,9 +14,8 @@ import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 @Entity
-@Getter
 @NoArgsConstructor
-@AllArgsConstructor
+@Data
 public class Place {
 
     @Id

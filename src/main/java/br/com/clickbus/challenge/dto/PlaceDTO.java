@@ -1,14 +1,15 @@
 package br.com.clickbus.challenge.dto;
 
 import br.com.clickbus.challenge.entity.Place;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotNull;
+
 import java.util.List;
 import java.util.stream.Collectors;
-
-@Getter
+;
+@Data
 @NoArgsConstructor
 public class PlaceDTO {
 
@@ -42,4 +43,6 @@ public class PlaceDTO {
     public Place buildPlace() {
         return Place.of(this.name, this.slug, this.city, this.state);
     }
+
+
 }

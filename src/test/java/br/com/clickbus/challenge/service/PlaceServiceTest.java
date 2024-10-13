@@ -11,7 +11,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -19,12 +18,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.anyLong;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
 
 
 @ExtendWith(MockitoExtension.class)
@@ -46,6 +45,29 @@ class PlaceServiceTest {
     }
 
     @Test
+    void whenFindAllOk() {
+
+        when(repository.findAll()).thenReturn(Collections.singletonList(place)); 
+
+        List<Place> actual = service.findAll();
+
+        assertEquals(1, actual.size());
+
+        verify(repository, atLeastOnce()).findAll();
+    }
+
+    @Test
+    void whenFindAllThenReturnEmpty() {
+        when(repository.findAll()).thenReturn(Collections.emptyList());
+
+        List<Place> actual = service.findAll();
+
+        assertEquals(0, actual.size());
+
+        verify(repository, atLeastOnce()).findAll();
+    }
+
+    @Test
     void whenFindByIdOk() {
         when(repository.findById(1L)).thenReturn(Optional.of(place));
 
@@ -57,9 +79,9 @@ class PlaceServiceTest {
         assertEquals(place.getState(), actual.getState());
         assertEquals(place.getCreatedAt(), actual.getCreatedAt());
         assertNull(actual.getUpdatedAt());
+
         verify(repository, atLeastOnce()).findById(anyLong());
     }
-
 
     @Test
     void whenFindByIdThenReturnEmpty() {
@@ -71,6 +93,7 @@ class PlaceServiceTest {
 
     @Test
     void whenFindByNameOk() {
+
         when(repository.findByName(NAME_PLACE)).thenReturn(Collections.singletonList(place));
 
         List<Place> actual = service.findByName(NAME_PLACE);
@@ -94,11 +117,13 @@ class PlaceServiceTest {
         Place actual = service.save(place);
 
         assertEquals(place, actual);
+
         verify(repository, atLeastOnce()).save(any(Place.class));
     }
 
     @Test
     void whenAlterPlaceOk() {
+
         String editedName = "Lorem Ipsum";
         PlaceDTO placeDTO = PlaceDTO.of(editedName, place.getSlug(), place.getCity(), place.getState());
         when(repository.save(any(Place.class))).thenReturn(place);
